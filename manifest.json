@@ -1,0 +1,23 @@
+{
+  "manifest_version": 2,
+  "name": "close-tab-right-click",
+  "version": "1.0",
+  "description": "Close tab from right click context menu.",
+  "icons": {
+    "48": "icons/icon-48.png",
+    "64": "icons/icon-64.png"
+  },
+  "background": {
+    "scripts": ["main.js"]
+  },
+  "applications": {
+    "gecko": {
+      "id": "close-tab-right-click@kakakikikeke.blogspot.com"
+    }
+  },
+  "permissions": [
+    "menus",
+    "tabs"
+  ],
+  "default_locale": "en"
+}
