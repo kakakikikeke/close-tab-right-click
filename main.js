@@ -23,7 +23,15 @@ browser.menus.onClicked.addListener((info, tab) => {
   switch (info.menuItemId) {
     case "close-tab":
       var removing = browser.tabs.remove(tab.id);
-      removing.then(onRemoved, onError);
+      removing.then(function() {
+        var getting = browser.storage.local.get("with_options");
+        getting.then(function(result) {
+          if (result.with_options.is_history_delete) {
+            var deleting = browser.history.deleteUrl({url: tab.url});
+            deleting.then(onRemoved, onError);
+          }
+        }, onError);
+      }, onError);
       break;
   }
 });
