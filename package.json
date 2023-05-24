@@ -1,10 +1,10 @@
 {
   "name": "close-tab-right-click",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Close tab from right click context menu.",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint ."
   },
   "author": "kakakikikeke <cdl.yoshinaka@gmail.com>",
   "license": "MPL-2.0",
