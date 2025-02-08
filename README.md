@@ -20,3 +20,12 @@ In option menu of this addon, you can enable any function you like.
 ## Bug Report
 
 Please sending an issue or pull-request on this repository.
+
+## Development
+### eslint
+* nvm use
+* npm i
+* npm run lint .
+
+### build
+* sh build.sh
