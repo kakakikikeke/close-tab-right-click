@@ -9,6 +9,6 @@
   "author": "kakakikikeke <cdl.yoshinaka@gmail.com>",
   "license": "MPL-2.0",
   "devDependencies": {
-    "eslint": "^8.41.0"
+    "eslint": "^9.23.0"
   }
 }
