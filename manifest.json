@@ -17,7 +17,7 @@
   },
   "permissions": ["menus", "tabs", "storage", "history"],
   "options_ui": {
-    "page": "options.html"
+    "page": "src/options.html"
   },
   "default_locale": "en"
 }
