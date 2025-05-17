@@ -2,14 +2,15 @@ function saveOptions(e) {
   e.preventDefault();
   browser.storage.local.set({
     with_options: {
-      is_history_delete: document.querySelector("#is_history_delete").checked
-    }
+      is_history_delete: document.querySelector("#is_history_delete").checked,
+    },
   });
 }
 
 function restoreOptions() {
   function setCurrentChoice(result) {
-    document.querySelector("#is_history_delete").checked = result.with_options.is_history_delete;
+    document.querySelector("#is_history_delete").checked =
+      result.with_options.is_history_delete;
   }
 
   function onError(error) {

@@ -1,7 +1,9 @@
 # close-tab-right-click
+
 Close tab from right click context menu.
 
 ## How to install
+
 Download addon from below URL.  
 https://addons.mozilla.org/ja/firefox/addon/close-tab-right-click/
 
@@ -13,6 +15,7 @@ https://addons.mozilla.org/ja/firefox/addon/close-tab-right-click/
 2. Just click "close tab" and close current tab.
 
 ### Options
+
 In option menu of this addon, you can enable any function you like.
 
 1. Delete history with closing tab
@@ -22,11 +25,22 @@ In option menu of this addon, you can enable any function you like.
 Please sending an issue or pull-request on this repository.
 
 ## Development
-### eslint
-* nvm use
-* npm i
-* npm fund && npm audit fix
-* npm run lint .
+
+### install
+
+- nvm use
+- npm i
+- npm fund && npm audit fix
+
+### format and lint
+
+- npm run format
+- npm run lint
+
+### test
+
+- npm run test
 
 ### build
-* sh build.sh
+
+- sh build.sh
