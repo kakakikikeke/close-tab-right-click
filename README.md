@@ -39,7 +39,7 @@ Please sending an issue or pull-request on this repository.
 
 ### test
 
-- npm run test
+- npm run test (Node.js built-in test runner; no additional test dependencies)
 
 ### build
 

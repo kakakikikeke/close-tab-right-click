@@ -28,7 +28,6 @@ export default defineConfig([
         ...globals.webextensions,
         ...globals.browser,
         ...globals.node,
-        ...globals.jest,
         importScripts: "readonly",
       },
 

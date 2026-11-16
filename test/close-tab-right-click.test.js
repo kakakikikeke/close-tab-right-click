@@ -1,120 +1,130 @@
+const { afterEach, beforeEach, describe, it } = require("node:test");
+const assert = require("node:assert/strict");
 const {
   onCreated,
   getExtensionInfo,
   closeTab,
 } = require("../src/close-tab-right-click");
 
+function createMock(implementation = () => {}) {
+  const calls = [];
+  const mock = (...args) => {
+    calls.push(args);
+    return implementation(...args);
+  };
+  mock.calls = calls;
+  return mock;
+}
+
 describe("close-tab-right-click.js", () => {
   const tabId = 123;
   const tabUrl = "https://example.com";
+  let originalConsoleLog;
 
   beforeEach(() => {
+    originalConsoleLog = console.log;
+    console.log = createMock();
     global.browser = {
       runtime: {
         lastError: null,
       },
       i18n: {
-        getMessage: jest.fn(),
+        getMessage: createMock(() => "Close Tab"),
       },
       tabs: {
-        remove: jest.fn(),
+        remove: createMock(() => Promise.resolve()),
       },
       storage: {
         local: {
-          get: jest.fn(),
+          get: createMock(() =>
+            Promise.resolve({
+              with_options: { is_history_delete: false },
+            }),
+          ),
         },
       },
       history: {
-        deleteUrl: jest.fn(),
+        deleteUrl: createMock(() => Promise.resolve()),
       },
     };
-    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    console.log = originalConsoleLog;
+    delete global.browser;
   });
 
   describe("onCreated", () => {
-    test("logs success message when no error", () => {
-      console.log = jest.fn();
+    it("logs success message when no error", () => {
       browser.runtime.lastError = null;
 
       onCreated();
 
-      expect(console.log).toHaveBeenCalledWith(
-        "close-tab-right-click item created successfully",
-      );
+      assert.deepEqual(console.log.calls, [
+        ["close-tab-right-click item created successfully"],
+      ]);
     });
 
-    test("logs error message when lastError exists", () => {
-      console.log = jest.fn();
+    it("logs error message when lastError exists", () => {
       browser.runtime.lastError = "some runtime error";
 
       onCreated();
 
-      expect(console.log).toHaveBeenCalledWith("Error: some runtime error");
+      assert.deepEqual(console.log.calls, [["Error: some runtime error"]]);
     });
   });
 
   describe("getExtensionInfo", () => {
-    test("returns extension info object", () => {
-      browser.i18n.getMessage.mockReturnValue("Close Tab");
-
+    it("returns extension info object", () => {
       const info = getExtensionInfo();
 
-      expect(info).toEqual({
+      assert.deepEqual(info, {
         id: "close-tab-right-click",
         title: "Close Tab",
         contexts: ["all"],
       });
 
-      expect(browser.i18n.getMessage).toHaveBeenCalledWith("menuItemClose");
+      assert.deepEqual(browser.i18n.getMessage.calls, [["menuItemClose"]]);
     });
   });
 
   describe("closeTab", () => {
-    test("removes tab and deletes history if with_options.is_history_delete is true", async () => {
+    it("removes tab and deletes history if with_options.is_history_delete is true", async () => {
       const info = { menuItemId: "close-tab-right-click" };
       const tab = { id: tabId, url: tabUrl };
 
-      const deleteUrlMock = jest.fn().mockResolvedValue();
-      const getMock = jest.fn().mockResolvedValue({
-        with_options: { is_history_delete: true },
-      });
+      browser.storage.local.get = createMock(() =>
+        Promise.resolve({
+          with_options: { is_history_delete: true },
+        }),
+      );
+      closeTab(info, tab);
 
-      browser.tabs.remove.mockResolvedValue();
-      browser.storage.local.get = getMock;
-      browser.history.deleteUrl = deleteUrlMock;
+      await new Promise((resolve) => setImmediate(resolve));
 
-      await closeTab(info, tab);
-
-      // flush nested promises
-      await new Promise(process.nextTick);
-
-      expect(browser.tabs.remove).toHaveBeenCalledWith(tabId);
-      expect(browser.storage.local.get).toHaveBeenCalledWith("with_options");
-      expect(browser.history.deleteUrl).toHaveBeenCalledWith({ url: tabUrl });
+      assert.deepEqual(browser.tabs.remove.calls, [[tabId]]);
+      assert.deepEqual(browser.storage.local.get.calls, [["with_options"]]);
+      assert.deepEqual(browser.history.deleteUrl.calls, [[{ url: tabUrl }]]);
     });
 
-    test("removes tab and does not delete history if is_history_delete is false", async () => {
+    it("removes tab and does not delete history if is_history_delete is false", async () => {
       const info = { menuItemId: "close-tab-right-click" };
       const tab = { id: tabId, url: tabUrl };
 
-      browser.tabs.remove.mockResolvedValue();
-      browser.storage.local.get.mockResolvedValue({
-        with_options: { is_history_delete: false },
-      });
+      closeTab(info, tab);
+      await new Promise((resolve) => setImmediate(resolve));
 
-      await closeTab(info, tab);
-
-      expect(browser.tabs.remove).toHaveBeenCalledWith(tabId);
-      expect(browser.history.deleteUrl).not.toHaveBeenCalled();
+      assert.deepEqual(browser.tabs.remove.calls, [[tabId]]);
+      assert.deepEqual(browser.history.deleteUrl.calls, []);
     });
 
-    test("does nothing if menuItemId does not match", async () => {
+    it("does nothing if menuItemId does not match", () => {
       const info = { menuItemId: "unrelated-id" };
       const tab = { id: tabId, url: tabUrl };
 
-      await closeTab(info, tab);
+      closeTab(info, tab);
 
-      expect(browser.tabs.remove).not.toHaveBeenCalled();
+      assert.deepEqual(browser.tabs.remove.calls, []);
     });
   });
 });
